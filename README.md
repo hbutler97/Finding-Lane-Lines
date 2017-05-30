@@ -1,4 +1,11 @@
-#**Finding Lane Lines on the Road** 
+#**Finding Lane Lines on the Road**
+
+Things to think about
+- order of operations
+  choose to get to lines using colors to make more advanced operations easier
+  Explain HLS choice 
+- Line detect is not detecting curves
+ 
 [![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
 
 <img src="examples/laneLines_thirdPass.jpg" width="480" alt="Combined Image" />
