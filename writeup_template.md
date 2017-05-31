@@ -45,3 +45,16 @@ Another shortcoming could be ...
 A possible improvement would be to ...
 
 Another potential improvement could be to ...
+
+
+Here is my pipeline
+
+
+short comings
+multiple lines in the lane
+polyfit line fit doesn't work well on curves
+
+
+
+
+might be able to do less processing by being smart about the order of operations
