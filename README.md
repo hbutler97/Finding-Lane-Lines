@@ -7,6 +7,7 @@ This project detects lane lines in images using Python, OpenCV and basic Compute
 Link to [project code](https://github.com/hbutler97/Finding-Lane-Lines/blob/master/my_P1.ipynb)
 
 Link to [Result YouTube Video](https://youtu.be/Cm0rEHQXRpo) Solid White Right Line
+
 Link to [Result YouTube Video](https://youtu.be/sn6F7q7k3CA) Solid Yellow Left Line
 
 
