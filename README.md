@@ -1,60 +1,81 @@
-#**Finding Lane Lines on the Road**
+# **Finding Lane Lines on the Road** 
 
-Things to think about
-- order of operations
-  choose to get to lines using colors to make more advanced operations easier
-  Explain HLS choice 
-- Line detect is not detecting curves
- 
-[![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
+## **Overview**
 
-<img src="examples/laneLines_thirdPass.jpg" width="480" alt="Combined Image" />
-
-Overview
----
-
-When we drive, we use our eyes to decide where to go.  The lines on the road that show us where the lanes are act as our constant reference for where to steer the vehicle.  Naturally, one of the first things we would like to do in developing a self-driving car is to automatically detect lane lines using an algorithm.
-
-In this project you will detect lane lines in images using Python and OpenCV.  OpenCV means "Open-Source Computer Vision", which is a package that has many useful tools for analyzing images.  
-
-To complete the project, two files will be submitted: a file containing project code and a file containing a brief write up explaining your solution. We have included template files to be used both for the [code](https://github.com/udacity/CarND-LaneLines-P1/blob/master/P1.ipynb) and the [writeup](https://github.com/udacity/CarND-LaneLines-P1/blob/master/writeup_template.md).The code file is called P1.ipynb and the writeup template is writeup_template.md 
-
-To meet specifications in the project, take a look at the requirements in the [project rubric](https://review.udacity.com/#!/rubrics/322/view)
+This project detects lane lines in images using Python, OpenCV and basic Computer Vision Principles.  The project leverages some of the basic properties of Lane Lines to produce lines that overlay the Lane Line
 
 
-Creating a Great Writeup
----
-For this project, a great writeup should provide a detailed response to the "Reflection" section of the [project rubric](https://review.udacity.com/#!/rubrics/322/view). There are three parts to the reflection:
+### **Reflection**
 
-1. Describe the pipeline
+The pipeline constructed leverages the shape, color, location and orientation of Lane Lines to locate them in the images.  The pipeline has the following stages
 
-2. Identify any shortcomings
+- Color Mask
+- Region of Interest
+- Edge Detection
+- Line Overlay
 
-3. Suggest possible improvements
+    
+#### Color Mask
 
-We encourage using images in your writeup to demonstrate how your pipeline works.  
+First property of focus was color.  The test images have both white and yellow lane lines.  The Color Mask stage of the pipeline transforms the image to [Hue, Saturation Lightness Color Space(HSL/HLS)](https://en.wikipedia.org/wiki/HSL_and_HSV) and the image is filtered for yellow and white colors.  HSL space is used as it yield good results with dealing with the color contrast of the image.  The image was filtered for white and yellow separtely and then those two images were combined to yield the results below.
 
-All that said, please be concise!  We're not looking for you to write a book here: just a brief description.
+     
+<figure>
+ <img src="test_images_output/color_select.png" width="380" alt="Combined Image" />
+</figure>
 
-You're not required to use markdown for your writeup.  If you use another method please just submit a pdf of your writeup. Here is a link to a [writeup template file](https://github.com/udacity/CarND-LaneLines-P1/blob/master/writeup_template.md). 
+#### Region of Interest
+Lanes detection has the natural property of being isolated to a specific region of the image as shown below.
+
+<figure>
+ <img src="test_images_output/region_select_base.png" width="380" alt="Combined Image" />
+</figure>
+
+The Region on Interest Stage applies a geometric mask to the Color Mask yielding the results below.
+
+<figure>
+ <img src="test_images_output/region_select.png" width="380" alt="Combined Image" />
+</figure>
+
+#### Canny Edge Detection
+
+Shape is another strong property of lane lines.  Canny Edge Detection is then applied to the image to locate line in image.  In this stage the image is converted to gray scale and Gaussian blur is applied for smoothing the lines prior to applying the Canny filter
+
+<figure>
+ <img src="test_images_output/canny.png" width="380" alt="Combined Image" />
+</figure>
 
 
-The Project
----
+#### Line Line Overlay
 
-## If you have already installed the [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) you should be good to go!   If not, you should install the starter kit to get started on this project. ##
+To produce the Lane Line overlay, The correct lines produced by the Canny Edge Detection needed to be selected.  One other property of lane lines is their general orientation in the image.  Hough Transform is applied to the image to produce a series of points(slope and y intercept).  Processing is done on that data set(described below) to produce an overlay on the original image as shown below.
+<figure>
+ <img src="test_images_output/final.png" width="380" alt="Combined Image" />
+</figure>
 
-**Step 1:** Set up the [CarND Term1 Starter Kit](https://classroom.udacity.com/nanodegrees/nd013/parts/fbf77062-5703-404e-b60c-95b78b2f3f9e/modules/83ec35ee-1e02-48a5-bdb7-d244bd47c2dc/lessons/8c82408b-a217-4d09-b81d-1bda4c6380ef/concepts/4f1870e0-3849-43e4-b670-12e6f2d4b7a7) if you haven't already.
 
-**Step 2:** Open the code in a Jupyter Notebook
 
-You will complete the project code in a Jupyter notebook.  If you are unfamiliar with Jupyter Notebooks, check out <A HREF="https://www.packtpub.com/books/content/basics-jupyter-notebook-and-python" target="_blank">Cyrille Rossant's Basics of Jupyter Notebook and Python</A> to get started.
+### Drawing Lane Line Overlay
 
-Jupyter is an Ipython notebook where you can run blocks of code and see results interactively.  All the code for this project is contained in a Jupyter notebook. To start Jupyter in your browser, use terminal to navigate to your project directory and then run the following command at the terminal prompt (be sure you've activated your Python 3 carnd-term1 environment as described in the [CarND Term1 Starter Kit](https://github.com/udacity/CarND-Term1-Starter-Kit/blob/master/README.md) installation instructions!):
+The end goal is to recreate a path based on lane markings... To produce the Lane Lines, we do the following:
 
-`> jupyter notebook`
+1. Lines are separated to the left and right line by assuming a mid point in the lane
+2. Transform the Canny Lane Line Segments to Hough Space.  This gives us a series of points that represent the slope and y-intercept
+3. Run a linear regression on the slope values to find an average
+4. Given the slope, and points, which happened to be at the edges of the region of interest, a full line segment is drawn
 
-A browser window will appear showing the contents of the current directory.  Click on the file called "P1.ipynb".  Another browser window will appear displaying the notebook.  Follow the instructions in the notebook to complete the project.  
 
-**Step 3:** Complete the project and submit both the Ipython notebook and the project writeup
+### Identify potential shortcomings with your current pipeline
 
+Pipeline is built on the crude assumptions(color, shape, location).  These are very good starting points, but have enough variation that can throw things off very easily.
+
+- For example lane lines are not always yellow and white.
+- There are also potential issues with color detection during different weather conditions and times(day/night) to consider.
+- Lane Lines also curve.  Using the line fitting technique will not work very well when considering the average slope of the whole lane line.
+- There could be other lines in the middle of the lane lines with any orientation.  
+
+### Possible improvements to your pipeline
+
+- Use different techniques for translating detected line points to line drawing.  There could be different polygons and/or curve fitting techniques to apply to that data set.
+- Explore different color detection adverse conditions.  Switching color spaces provided a means to manage contrast in these images.  There could be other conditions where this approach doesn't work well
+- Be smart about which elements of the image to process.  Much of the processing in this project was done on the whole image.  This is not necessary for purely line detection. Being that this is a real time system, doing expensive computations will eat into your response time budget.  
